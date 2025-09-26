@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout Application Repository
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
@@ -29,28 +29,31 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/hello-app:${{ github.run_number }}
             ${{ secrets.DOCKER_USERNAME }}/hello-app:latest
-  push:
-    runs-on: ubuntu-latest
-    steps:
+      
       - name: Checkout Manifests Repository
         uses: actions/checkout@v4
         with:
           repository: Elleres/hello-manifests 
           token: ${{ secrets.MANIFEST_REPO_PAT }}
-          path: hello-manifests
+          path: hello-manifests 
+          fetch-depth: 1 
+
+      - name: Make Manifests a normal folder
+        run: rm -rf hello-manifests/.git
 
       - name: Update image tag in manifest
         run: |
+          # CORREÇÃO: Caminho do arquivo aninhado
           sed -i "s|image: gelleres/hello-app:.*|image: gelleres/hello-app:${{ github.run_number }}|" hello-manifests/manifests/deploy.yaml
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.MANIFEST_REPO_PAT }}
+          path: hello-manifests 
           commit-message: 'feat: Atualiza a imagem para a versão ${{ github.run_number }}'
           title: 'Atualiza a imagem hello-app para a versão ${{ github.run_number }}'
           body: 'Este PR atualiza a tag da imagem `hello-app` para a versão mais recente do build do CI/CD.'
           branch: 'update-hello-app-image-${{ github.run_number }}'
           base: 'main'
           delete-branch: true
-
