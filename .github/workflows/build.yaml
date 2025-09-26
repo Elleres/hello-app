@@ -51,3 +51,5 @@ jobs:
           branch: 'update-hello-app-image-${{ github.run_number }}'
           base: 'main'
           delete-branch: true
+          enable-automerge: true
+          automerge-method: true
