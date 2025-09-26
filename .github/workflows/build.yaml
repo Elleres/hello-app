@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_push:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -29,7 +29,9 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/hello-app:${{ github.run_number }}
             ${{ secrets.DOCKER_USERNAME }}/hello-app:latest
-
+  push:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout Manifests Repository
         uses: actions/checkout@v4
         with:
@@ -51,5 +53,4 @@ jobs:
           branch: 'update-hello-app-image-${{ github.run_number }}'
           base: 'main'
           delete-branch: true
-          enable-automerge: true
-          automerge-method: true
+
