@@ -33,7 +33,7 @@ jobs:
       - name: Checkout Manifests Repository
         uses: actions/checkout@v4
         with:
-          repository: Elleres/manifests 
+          repository: Elleres/hello-manifests 
           token: ${{ secrets.MANIFEST_REPO_PAT }}
           path: manifests
 
